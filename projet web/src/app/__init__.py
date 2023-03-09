@@ -1,45 +1,79 @@
-from flask import Flask, render_template
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import select
-import os
+{% extends "base.html" %}
+{% block content %}
+    <h1>Diagramme circulaire et diagramme en barres</h1>
+    <canvas id="pieChart"></canvas>
+    <canvas id="barChart"></canvas>
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-db=SQLAlchemy(app)
-#db.init_app(app)
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var pieCtx = document.getElementById('pieChart').getContext('2d');
+        var pieChart = new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: {{labels | tojson}},
+                datasets: [{
+                    label: '# of Votes',
+                    data: {{values | tojson}},
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(153, 102, 255, 0.5)',
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
 
-class Data(db.Model):
-    __tablename__ = "data"
-
-    id = db.Column(db.Integer, primary_key=True)
-    rna_id = db.Column(db.String(30), nullable=True) 
-    rna_id_ex = db.Column(db.String(30), nullable=True)
-    gestion = db.Column(db.String(20), nullable=True)
-
-@app.route('/')
-def home():
-    return render_template('home.html')
-
-@app.route('/about')
-def about():
-    return render_template('about.html')
-@app.route('/assos')
-def assos():
-    #stmt = select(Data)
-    #datas = Data.query.limit(10).all()
-    datas = Data.query.limit(10).all()
-  
-    return render_template('assos.html', datas=datas)
-    #result = db.session.execute(stmt)
-    #for data in datas:
-     #   print(f"{data.rna_id}")
-    #return render_template('assos.html')
-
-@app.route('/hello')
-@app.route('/hello/<name>')
-def hello(name=None):
-    return render_template('hello.html', name=name)
-if __name__ == '__main__':
-    app.run()  
-
-
+        var barCtx = document.getElementById('barChart').getContext('2d');
+        var barChart = new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: {{labels | tojson}},
+                datasets: [{
+                    label: '# of Votes',
+                    data: {{values | tojson}},
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(153, 102, 255, 0.5)',
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock %}
